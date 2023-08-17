@@ -5,20 +5,31 @@ import {
   StyleSheet,
   TextInput,
   ScrollView,
+  StatusBar,
 } from 'react-native';
 import React from 'react';
 import {useNavigation} from '@react-navigation/native';
-import {logout as logoutAction} from '../redux/reducers/auth';
 import {useDispatch, useSelector} from 'react-redux';
-import Button from '../components/Button';
 import SplashScreen from 'react-native-splash-screen';
 import http from '../helpers/http';
+import FeatherIcon from 'react-native-vector-icons/Feather';
+import {setEventData} from '../redux/reducers/eventData';
+import {setProfileData} from '../redux/reducers/profileData';
+import moment from 'moment';
+import Icon from 'react-native-vector-icons/Feather';
+import ImageTemplate from '../components/ImageTemplate';
+import IMGEventDef from '../assets/image/eventDefault.jpg';
+import EventDate from '../components/EventDate';
 
 const Home = () => {
   const navigation = useNavigation();
   const dispatch = useDispatch();
   const deviceToken = useSelector(state => state.deviceToken.data);
   const token = useSelector(state => state.auth.token);
+  const [search, setSearch] = React.useState('');
+  const events = useSelector(state => state.eventData.eventData);
+  const [categories, setCategories] = React.useState([]);
+
   const saveToken = React.useCallback(async () => {
     const form = new URLSearchParams({token: deviceToken.token});
     await http(token).post('/device-token', form.toString());
@@ -28,91 +39,118 @@ const Home = () => {
     saveToken();
   }, [saveToken]);
 
-  const doLogout = () => {
-    dispatch(logoutAction());
-    // navigation.navigate('Login');
+  const handleSearch = () => {
+    navigation.navigate('SearchResults', search);
   };
+
+  const getCategory = React.useCallback(async () => {
+    const {data} = await http().get('/category');
+    setCategories(data.results);
+  }, []);
+
+  const getProfile = React.useCallback(async () => {
+    const {data} = await http(token).get('/profile');
+    dispatch(setProfileData(data.results));
+  }, [token, dispatch]);
+
+  const getEvents = React.useCallback(async () => {
+    const {data} = await http().get('/events');
+    dispatch(setEventData(data.results));
+  }, [dispatch]);
+
+  React.useEffect(() => {
+    getProfile();
+    getEvents();
+    getCategory();
+  }, [getProfile, getEvents, getCategory]);
 
   React.useEffect(() => {
     SplashScreen.hide();
   }, []);
 
+  const handlePressEvent = id => {
+    navigation.navigate('DetailEvent', {id});
+  };
+
+  const uniqueDates = [...new Set(events?.map(item => item?.date))];
+
   return (
-    <ScrollView style={style.wrapper}>
+    <View style={style.wrapper}>
+      <StatusBar translucent={true} backgroundColor="transparent" />
       <View>
+        <View style={style.drawerContainer}>
+          <View>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <FeatherIcon name="menu" size={35} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+          <View>
+            <TouchableOpacity onPress={() => navigation.openDrawer()}>
+              <FeatherIcon name="message-square" size={30} color="#FFF" />
+            </TouchableOpacity>
+          </View>
+        </View>
         <TextInput
           style={style.textInput}
           placeholderTextColor="white"
           placeholder="Search Event..."
+          onChangeText={event => setSearch(event)}
+          onSubmitEditing={() => handleSearch(search)}
         />
       </View>
-      <View style={style.contsiner} horizontal={false}>
+      <ScrollView style={style.contsiner} horizontal={false}>
         <View>
           <Text style={style.containerText}>Events For You</Text>
         </View>
         <ScrollView horizontal={true} style={style.wrapperBox}>
-          <View style={style.containerTextNew}>
-            <View style={style.warapperTextCont}>
-              <Text style={style.textNew}>Wed, 15 Nov, 4:00 PM</Text>
-              <Text style={style.textContaninerNew}>
-                Sights & Sounds Exhibition
-              </Text>
-            </View>
-            <TouchableOpacity
-              style={style.button1}
-              onPress={() => navigation.navigate('Events')}>
-              {/* <Text>Next</Text> */}
-            </TouchableOpacity>
-          </View>
-          <View style={style.containerTextNew}>
-            <View style={style.warapperTextCont}>
-              <Text style={style.textNew}>Wed, 15 Nov, 4:00 PM</Text>
-              <Text style={style.textContaninerNew}>
-                Sights & Sounds Exhibition
-              </Text>
-            </View>
-            <TouchableOpacity
-              onPress={() => navigation.navigate('Profile')}
-              style={style.button1}>
-              {/* <Text>Next</Text> */}
-            </TouchableOpacity>
-          </View>
+          <ScrollView horizontal={true} style={style.wrapperBox}>
+            {events &&
+              events.map(item => {
+                return (
+                  <View style={style.containerTextNew} key={`${item?.id}-wow`}>
+                    <ImageTemplate
+                      src={item?.picture || null}
+                      defaultImg={IMGEventDef}
+                      style={style.eventImages}
+                    />
+
+                    <View style={style.wrapAllContent}>
+                      <View style={style.warapperTextCont}>
+                        <Text style={style.textNew}>
+                          {moment(item?.date).format('LLLL').slice(0, 3)}
+                          {', '}
+                          {moment(item?.date).format('LLL')}
+                        </Text>
+                        <Text style={style.textContaninerNew}>
+                          {item?.title.slice(0, 14) + ' ...'}
+                        </Text>
+                        <TouchableOpacity
+                          style={style.button1}
+                          onPress={() => handlePressEvent(item?.id)}>
+                          <Icon name="arrow-right" size={30} color="#FFF" />
+                        </TouchableOpacity>
+                      </View>
+                    </View>
+                  </View>
+                );
+              })}
+          </ScrollView>
         </ScrollView>
         <View>
           <Text style={style.containerText}>Discover</Text>
         </View>
-        {/* <ScrollView style={style.wrapperBox} horizontal={true}>
-          <View style={style.wrapperBoxNew}>
-            <TouchableOpacity
-              style={style.wrapperBoxDiscover}
-              onPress={() => navigation.navigate('MyBooking')}>
-              <View style={style.iconDiscover}>
-                <Text>0</Text>
-              </View>
-              <Text style={style.textDiscover}>YOUR AREA</Text>
-            </TouchableOpacity>
-          </View>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('MyWishlist')}
-            style={style.wrapperBoxNew}>
-            <View style={style.wrapperBoxDiscover}>
-              <View style={style.iconDiscover}>
-                <Text>0</Text>
-              </View>
-              <Text style={style.textDiscover}>YOUR AREA</Text>
+        <ScrollView style={style.wrapperBox} horizontal={true}>
+          {categories.map(item => (
+            <View key={`category-list-${item.id}`} style={style.wrapperBoxNew}>
+              <TouchableOpacity style={style.wrapperBoxDiscover}>
+                <View style={style.iconDiscover}>
+                  <Text>{item?.name.slice(0, 1)}</Text>
+                </View>
+                <Text style={style.textDiscover}>{item.name}</Text>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => navigation.navigate('ManageEvent')}
-            style={style.wrapperBoxNew}>
-            <View style={style.wrapperBoxDiscover}>
-              <View style={style.iconDiscover}>
-                <Text>0</Text>
-              </View>
-              <Text style={style.textDiscover}>YOUR AREA</Text>
-            </View>
-          </TouchableOpacity>
-        </ScrollView> */}
+          ))}
+        </ScrollView>
         <View style={style.containerUpcoming}>
           <Text style={style.containerTextUpcoming}>Upcoming</Text>
           <Text>See all</Text>
@@ -120,66 +158,111 @@ const Home = () => {
         <View style={style.monthTextCont}>
           <Text style={style.monthText}>SEP</Text>
         </View>
-        <View style={style.upcomingBox}>
-          <View style={style.upcomingTextCont}>
-            <View style={style.textContDay}>
-              <Text style={style.textDay}>15</Text>
-              <Text>Wed</Text>
-            </View>
-          </View>
-          <View style={style.contentUpcoming}>
-            <View style={style.containerTextNew}>
-              <View style={style.warapperTextCont}>
-                <Text style={style.textNew}>Wed, 15 Nov, 4:00 PM</Text>
-                <Text style={style.textContaninerNew}>
-                  Sights & Sounds Exhibition
-                </Text>
+        {uniqueDates?.map(date => {
+          const itemsByDate = events.filter(item => item?.date === date);
+          const item = itemsByDate[0];
+          return (
+            <View key={`event-by-date-${item?.id}`} style={style.upcomingBox}>
+              <EventDate dates={item?.date} days={item?.date} />
+              <View style={style.contentUpcoming}>
+                <View style={style.containerTextNew}>
+                  <ImageTemplate
+                    src={item?.picture || null}
+                    defaultImg={IMGEventDef}
+                    style={style.eventImages}
+                  />
+
+                  <View style={style.wrapAllContent}>
+                    <View style={style.warapperTextCont}>
+                      <Text style={style.textNew}>
+                        {moment(item?.date).format('LLLL').slice(0, 3)}
+                        {', '}
+                        {moment(item?.date).format('LLL')}
+                      </Text>
+                      <Text style={style.textContaninerNew}>
+                        {item?.title.slice(0, 14) + ' ...'}
+                      </Text>
+                      <TouchableOpacity
+                        style={style.button1}
+                        onPress={() => handlePressEvent(item?.id)}>
+                        <Icon name="arrow-right" size={30} color="#FFF" />
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                </View>
+                <TouchableOpacity style={style.buttonUpcoming}>
+                  <Text style={style.textButton}>
+                    Show All {itemsByDate.length} Events
+                  </Text>
+                </TouchableOpacity>
               </View>
-              <TouchableOpacity style={style.button1}>
-                {/* <Text>Next</Text> */}
-              </TouchableOpacity>
             </View>
-            <TouchableOpacity style={style.buttonUpcoming}>
-              <Text style={style.textButton}>Show All 5 Events</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View style={style.upcomingBox}>
-          <View style={style.upcomingTextCont}>
-            <View style={style.textContDay}>
-              <Text style={style.textDay}>16</Text>
-              <Text>Thu</Text>
-            </View>
-          </View>
-          <View style={style.contentUpcoming}>
-            <View style={style.containerTextNew}>
-              <View style={style.warapperTextCont}>
-                <Text style={style.textNew}>Wed, 15 Nov, 4:00 PM</Text>
-                <Text style={style.textContaninerNew}>
-                  Sights & Sounds Exhibition
-                </Text>
-              </View>
-              <TouchableOpacity style={style.button1}>
-                {/* <Text>Next</Text> */}
-              </TouchableOpacity>
-            </View>
-            <TouchableOpacity style={style.buttonUpcoming}>
-              <Text style={style.textButton}>Show All 5 Events</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-        <View>
-          <Button onPress={doLogout}>Log Out</Button>
-        </View>
-      </View>
-    </ScrollView>
+          );
+        })}
+      </ScrollView>
+    </View>
   );
 };
 
 const style = StyleSheet.create({
+  containerTextNew: {
+    width: 260,
+    height: 376,
+    borderRadius: 40,
+    marginLeft: 20,
+    marginRight: 20,
+    gap: 10,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  wrapAllContent: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    zIndex: 1,
+  },
+  dissolveContainer: {flex: 1},
+  eventImages: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  textContaninerNew: {
+    color: 'white',
+    fontSize: 22,
+    fontFamily: 'Poppins-SemiBold',
+    textTransform: 'capitalize',
+  },
+  textNew: {
+    fontSize: 16,
+    fontFamily: 'Poppins-SemiBold',
+    color: 'white',
+    width: 200,
+  },
+  warapperTextCont: {
+    position: 'absolute',
+    bottom: 50,
+    left: 20,
+  },
+
+  button1: {
+    backgroundColor: '#FF3D71',
+    width: 45,
+    height: 45,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 20,
+  },
+  drawerContainer: {
+    padding: 30,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
   wrapper: {
     backgroundColor: '#E14D2A',
     gap: 30,
+    paddingTop: 30,
   },
   contsiner: {
     backgroundColor: 'white',
@@ -187,6 +270,7 @@ const style = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     gap: 10,
+    marginBottom: 150,
   },
   textColor: {
     color: 'white',
@@ -209,30 +293,7 @@ const style = StyleSheet.create({
     color: 'black',
     padding: 30,
   },
-  containerTextNew: {
-    width: 260,
-    height: 376,
-    backgroundColor: 'black',
-    borderRadius: 40,
-    marginLeft: 20,
-    marginRight: 20,
-    padding: 20,
-    gap: 10,
-  },
-  textContaninerNew: {
-    color: 'white',
-    fontSize: 22,
-    fontWeight: 'bold',
-  },
-  textNew: {
-    fontSize: 16,
-    fontWeight: 'semibold',
-    color: 'white',
-  },
-  warapperTextCont: {
-    backgroundColor: 'black',
-    marginTop: 200,
-  },
+
   wrapperBox: {
     flexDirection: 'row',
     gap: 10,
@@ -254,20 +315,15 @@ const style = StyleSheet.create({
     shadowRadius: 10,
     elevation: 4,
   },
-  button1: {
-    backgroundColor: 'red',
-    width: 45,
-    height: 45,
-    borderRadius: 10,
-  },
+
   textDiscover: {
     fontSize: 16,
-    color: '#884DFF',
+    color: '#f0a695',
   },
   iconDiscover: {
     width: 45,
     height: 45,
-    backgroundColor: '#D0B8FF',
+    backgroundColor: '#f0a695',
     borderRadius: 50,
     justifyContent: 'center',
     alignItems: 'center',
