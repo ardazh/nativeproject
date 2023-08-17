@@ -1,6 +1,6 @@
 import {View, TextInput, TouchableOpacity} from 'react-native';
 import React from 'react';
-import globalStyles from '../assets/globalStyles';
+import globalStyles from '../assets/css/globalStyles';
 import Icon from 'react-native-vector-icons/Feather';
 
 const Input = ({secureTextEntry, ...rest}) => {

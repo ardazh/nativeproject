@@ -1,6 +1,6 @@
 import {Text, TouchableOpacity} from 'react-native';
 import React from 'react';
-import globalStyles from '../assets/globalStyles';
+import globalStyles from '../assets/css/globalStyles';
 
 const Button = ({children, disabled, ...rest}) => {
   return (

@@ -1,6 +1,6 @@
 import {View, Text, StyleSheet} from 'react-native';
 import React from 'react';
-import globalStyles from '../assets/globalStyles';
+import globalStyles from '../assets/css/globalStyles';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import {useNavigation} from '@react-navigation/native';
