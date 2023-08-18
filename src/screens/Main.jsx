@@ -10,6 +10,7 @@ import ResetPassword from './ResetPassword';
 
 import Home from './Home';
 import Profile from './Profile';
+import EditProfile from './EditProfile';
 import DetailEvent from './DetailEvent';
 import SearchResults from './SearchResults';
 import {logout} from '../redux/reducers/auth';
@@ -159,6 +160,12 @@ function MyDrawer() {
       <Drawer.Screen
         name="DetailEvent"
         component={DetailEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+
+      <Drawer.Screen
+        name="EditProfile"
+        component={EditProfile}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
