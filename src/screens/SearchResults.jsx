@@ -40,7 +40,7 @@ const SearchResults = ({route, navigation}) => {
     React.useCallback(() => {
       const fetchData = async () => {
         const {data} = await http().get(
-          `/events?searchName=${seacrhItem}&page=${currentPage}&limit=${limitData}&sort=${sortEvent}&sortBy=${sortEventBy}`,
+          `/events?search=${seacrhItem}&page=${currentPage}&limit=${limitData}&sort=${sortEvent}&sortBy=${sortEventBy}`,
         );
         setEvent([...events, ...data.results]);
       };
