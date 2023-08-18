@@ -206,8 +206,8 @@ const Home = () => {
 
 const style = StyleSheet.create({
   containerTextNew: {
-    width: 260,
-    height: 376,
+    width: 240,
+    height: 356,
     borderRadius: 40,
     marginLeft: 20,
     marginRight: 20,
@@ -270,7 +270,7 @@ const style = StyleSheet.create({
     borderTopRightRadius: 30,
     borderTopLeftRadius: 30,
     gap: 10,
-    marginBottom: 150,
+    marginBottom: 200,
   },
   textColor: {
     color: 'white',
