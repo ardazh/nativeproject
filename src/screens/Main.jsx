@@ -27,6 +27,8 @@ import FontAwesome5Icon from 'react-native-vector-icons/FontAwesome5';
 import ImageTemplate from '../components/ImageTemplate';
 import IMGProfile from '../assets/image/default.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
+import MyBooking from './MyBooking';
+import MyWishlist from './MyWishlist';
 
 const AuthStack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator();
@@ -149,6 +151,28 @@ function MyDrawer() {
             <FeatherIcon name="user" color={color} size={size} />
           ),
           drawerLabel: 'Profile',
+        }}
+      />
+
+      <Drawer.Screen
+        name="MyBooking"
+        component={MyBooking}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="clipboard" color={color} size={size} />
+          ),
+          drawerLabel: 'My Booking',
+        }}
+      />
+
+      <Drawer.Screen
+        name="MyWishlist"
+        component={MyWishlist}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="heart" color={color} size={size} />
+          ),
+          drawerLabel: 'My Wishlist',
         }}
       />
 

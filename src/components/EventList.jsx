@@ -159,6 +159,7 @@ const style = StyleSheet.create({
     justifyContent: 'start',
     width: '100%',
     gap: 30,
+    marginTop: 10,
   },
 
   sectionWishlistLeft: {
