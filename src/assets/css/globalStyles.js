@@ -4,7 +4,7 @@ const globalStyles = StyleSheet.create({
   btn: {
     width: '100%',
     height: 55,
-    backgroundColor: '#FD841F',
+    backgroundColor: '#e14d2a',
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 15,
