@@ -54,7 +54,7 @@ const Booking = ({navigation}) => {
       sectionId: filledSection.id,
       quantity: filledSection.quantity,
     }).toString();
-    const {data} = await http(token).post('/reservation', form);
+    const {data} = await http(token).post('/reservations', form);
 
     const dataBooking = {
       eventId,
