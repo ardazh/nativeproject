@@ -34,6 +34,7 @@ import CreateEvent from './CreateEvent';
 import UpdateEvent from './UpdateEvent';
 import DetailsEvent from './DetailsEvent';
 import Booking from './Booking';
+import Payment from './Payment';
 
 const AuthStack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator();
@@ -237,6 +238,12 @@ function MyDrawer() {
       <Drawer.Screen
         name="Booking"
         component={Booking}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+
+      <Drawer.Screen
+        name="Payment"
+        component={Payment}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
