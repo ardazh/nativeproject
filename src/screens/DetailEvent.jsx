@@ -15,13 +15,15 @@ import moment from 'moment';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {ScrollView} from 'react-native-gesture-handler';
-import {useSelector} from 'react-redux';
+import {useDispatch, useSelector} from 'react-redux';
 import {useFocusEffect} from '@react-navigation/native';
+import {setEventId} from '../redux/reducers/eventId';
 
 const DetailEvent = ({route, navigation}) => {
   const {id} = route.params;
   const [eventDetail, setEventDetail] = React.useState({});
   const token = useSelector(state => state.auth.token);
+  const dispatch = useDispatch();
   const [wishlistBtn, setWishlistBtn] = React.useState(false);
 
   React.useEffect(() => {
@@ -36,6 +38,7 @@ const DetailEvent = ({route, navigation}) => {
 
   const handlePressEvent = eventId => {
     navigation.navigate('Booking', {eventId});
+    dispatch(setEventId(eventId));
   };
 
   useFocusEffect(
