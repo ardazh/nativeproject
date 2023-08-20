@@ -15,10 +15,14 @@ import moment from 'moment';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import FAwesome from 'react-native-vector-icons/FontAwesome';
 import {ScrollView} from 'react-native-gesture-handler';
+import {useSelector} from 'react-redux';
+import {useFocusEffect} from '@react-navigation/native';
 
 const DetailEvent = ({route, navigation}) => {
   const {id} = route.params;
   const [eventDetail, setEventDetail] = React.useState({});
+  const token = useSelector(state => state.auth.token);
+  const [wishlistBtn, setWishlistBtn] = React.useState(false);
 
   React.useEffect(() => {
     const getEventData = async () => {
@@ -32,6 +36,42 @@ const DetailEvent = ({route, navigation}) => {
 
   const handlePressEvent = eventId => {
     navigation.navigate('Booking', {eventId});
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      const eventId = {eventId: id};
+      const qString = new URLSearchParams(eventId).toString();
+      const fetchData = async () => {
+        const {data} = await http(token).get(`/wishlist/check?${qString}`);
+        const btnStatus = data.results;
+        if (btnStatus) {
+          setWishlistBtn(true);
+        } else {
+          setWishlistBtn(false);
+        }
+      };
+      fetchData();
+    }, [token, id]),
+  );
+
+  const addRemoveWishlist = async () => {
+    try {
+      const eventId = {eventId: id};
+      const qString = new URLSearchParams(eventId).toString();
+      const {data} = await http(token).post('/wishlists', qString);
+      console.log(data);
+      if (wishlistBtn) {
+        setWishlistBtn(false);
+      } else {
+        setWishlistBtn(true);
+      }
+    } catch (err) {
+      const message = err?.response?.data?.message;
+      if (message) {
+        console.log(message);
+      }
+    }
   };
 
   return (
@@ -49,8 +89,12 @@ const DetailEvent = ({route, navigation}) => {
             </TouchableOpacity>
           </View>
           <View>
-            <TouchableOpacity>
-              <FAwesome name="heart" size={30} color="red" />
+            <TouchableOpacity onPress={addRemoveWishlist}>
+              {wishlistBtn === true ? (
+                <FAwesome name="heart" size={30} color="red" />
+              ) : (
+                <FAwesome name="heart-o" size={30} color="#fff" />
+              )}
             </TouchableOpacity>
           </View>
         </View>
