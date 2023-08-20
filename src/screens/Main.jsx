@@ -29,6 +29,10 @@ import IMGProfile from '../assets/image/default.png';
 import FeatherIcon from 'react-native-vector-icons/Feather';
 import MyBooking from './MyBooking';
 import MyWishlist from './MyWishlist';
+import ManageEvent from './ManageEvent';
+import CreateEvent from './CreateEvent';
+import UpdateEvent from './UpdateEvent';
+import DetailsEvent from './DetailsEvent';
 
 const AuthStack = createNativeStackNavigator();
 const Stack = createNativeStackNavigator();
@@ -144,6 +148,17 @@ function MyDrawer() {
       />
 
       <Drawer.Screen
+        name="ManageEvent"
+        component={ManageEvent}
+        options={{
+          drawerIcon: ({color, size}) => (
+            <FeatherIcon name="plus-circle" color={color} size={size} />
+          ),
+          drawerLabel: 'Manage Event',
+        }}
+      />
+
+      <Drawer.Screen
         name="Profile"
         component={Profile}
         options={{
@@ -197,6 +212,24 @@ function MyDrawer() {
       <Drawer.Screen
         name="ChangePassword"
         component={ChangePassword}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+
+      <Drawer.Screen
+        name="CreateEvent"
+        component={CreateEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+
+      <Drawer.Screen
+        name="UpdateEvent"
+        component={UpdateEvent}
+        options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
+      />
+
+      <Drawer.Screen
+        name="DetailsEvent"
+        component={DetailsEvent}
         options={({drawerLabel: () => null}, {drawerItemStyle: {height: 0}})}
       />
     </Drawer.Navigator>
