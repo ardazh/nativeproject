@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
 import globalStyles from '../assets/css/globalStyles';
 import Input from '../components/Input';
@@ -43,7 +43,7 @@ const Regsiter = () => {
   }, []);
 
   return (
-    <View style={styles.wrapper}>
+    <ScrollView style={styles.wrapper}>
       <View style={styles.heading}>
         <View>
           <Text style={globalStyles.title}>Sign Up</Text>
@@ -122,7 +122,7 @@ const Regsiter = () => {
                 <Text>Accept terms and condition</Text>
               </View>
             </View>
-            <View>
+            <View style={styles.secButton}>
               <Button
                 disabled={!touched.email && !touched.password}
                 onPress={handleSubmit}>
@@ -132,7 +132,7 @@ const Regsiter = () => {
           </>
         )}
       </Formik>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -147,11 +147,15 @@ const styles = StyleSheet.create({
   },
   formCheck: {
     marginTop: 15,
+    marginBottom: 15,
     flexDirection: 'row',
     gap: 15,
   },
   formGap: {
     gap: 15,
+  },
+  secButton: {
+    marginBottom: 20,
   },
 });
 

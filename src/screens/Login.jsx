@@ -1,4 +1,4 @@
-import {View, Text, StyleSheet} from 'react-native';
+import {View, Text, StyleSheet, ScrollView} from 'react-native';
 import React from 'react';
 import globalStyles from '../assets/css/globalStyles';
 import Input from '../components/Input';
@@ -25,7 +25,7 @@ const Login = () => {
     dispatch(asyncLogin(values));
   };
   return (
-    <View style={styles.wrapper}>
+    <ScrollView style={styles.wrapper}>
       <View style={styles.heading}>
         <View>
           <Text style={globalStyles.title}>Log In</Text>
@@ -104,7 +104,7 @@ const Login = () => {
           </View>
         </View>
       </View>
-    </View>
+    </ScrollView>
   );
 };
 
@@ -130,6 +130,7 @@ const styles = StyleSheet.create({
   formAlternativeIcons: {
     flexDirection: 'row',
     gap: 15,
+    marginBottom: 20,
   },
   borderAlternativeIcons: {
     width: 95,
