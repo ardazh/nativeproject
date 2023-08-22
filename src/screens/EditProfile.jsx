@@ -51,30 +51,30 @@ const EditProfile = ({navigation}) => {
     getProfile();
   }, [token]);
 
-  const getImage = async source => {
-    let results;
-    if (!source) {
-      results = await launchImageLibrary();
-    } else {
-      results = await launchCamera({
-        quality: 0.5,
-      });
-    }
-    const data = results.assets[0];
-    console.log(data);
-    if (data.uri) {
-      setSelectedPicture({
-        name: data.fileName,
-        type: data.type,
-        uri:
-          Platform.OS === 'android'
-            ? data.uri
-            : data.uri.replace('file://', ''),
-      });
+  // const getImage = async source => {
+  //   let results;
+  //   if (!source) {
+  //     results = await launchImageLibrary();
+  //   } else {
+  //     results = await launchCamera({
+  //       quality: 0.5,
+  //     });
+  //   }
+  //   const data = results.assets[0];
+  //   console.log(data);
+  //   if (data.uri) {
+  //     setSelectedPicture({
+  //       name: data.fileName,
+  //       type: data.type,
+  //       uri:
+  //         Platform.OS === 'android'
+  //           ? data.uri
+  //           : data.uri.replace('file://', ''),
+  //     });
 
-      setFileResponse(data.uri);
-    }
-  };
+  //     setFileResponse(data.uri);
+  //   }
+  // };
 
   const doEdit = async values => {
     setIndicator(true);
@@ -114,6 +114,11 @@ const EditProfile = ({navigation}) => {
       form.append('gender', 2);
     }
 
+    const getProfile = async () => {
+      const {data} = await http(token).get('/profile');
+      setProfile(data.results);
+    };
+
     try {
       const {data} = await http(token).patch('/profile', form, {
         headers: {
@@ -127,10 +132,6 @@ const EditProfile = ({navigation}) => {
       console.warn(err);
     }
 
-    const getProfile = async () => {
-      const {data} = await http(token).get('/profile');
-      setProfile(data.results);
-    };
     setIndicator(false);
     setEditEmail(false);
     setEditPhone(false);
@@ -139,7 +140,29 @@ const EditProfile = ({navigation}) => {
     setFileResponse([]);
   };
 
-  console.log(indicator);
+  const handleCameraSelection = React.useCallback(async () => {
+    try {
+      const response = await launchCamera({
+        presentationStyle: 'fullScreen',
+      });
+
+      setFileResponse(response.assets[0].uri);
+    } catch (err) {
+      console.warn(err);
+    }
+  }, []);
+
+  const handleDocumentSelection = React.useCallback(async () => {
+    try {
+      const response = await launchImageLibrary({
+        presentationStyle: 'fullScreen',
+      });
+
+      setFileResponse(response.assets[0].uri);
+    } catch (err) {
+      console.warn(err);
+    }
+  }, []);
 
   const handlePressEvent = () => {
     navigation.navigate('Profile');
@@ -196,9 +219,15 @@ const EditProfile = ({navigation}) => {
                   </View>
                 </View>
                 <View style={style.textGap20}>
-                  <TouchableOpacity onPress={() => getImage()}>
-                    {/* <FeatherIcon name="camera" size={25} color="grey" /> */}
-                    <Text>Choose Picture</Text>
+                  <TouchableOpacity
+                    style={style.btnLoadImg}
+                    onPress={handleDocumentSelection}>
+                    <FeatherIcon name="file-plus" size={25} color="black" />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={style.btnLoadImg}
+                    onPress={handleCameraSelection}>
+                    <FeatherIcon name="camera" size={25} color="black" />
                   </TouchableOpacity>
                 </View>
               </View>
@@ -507,7 +536,7 @@ const style = StyleSheet.create({
   textGap20: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 40,
+    gap: 10,
   },
   container: {
     paddingTop: 30,
